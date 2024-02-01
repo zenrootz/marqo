@@ -39,6 +39,11 @@ def build_index():
     # record the start time:
     t0 = datetime.datetime.now()
 
+    try:
+        mq.index(INDEX_NAME).delete()
+    except:
+        pass
+
     # Create the index. The model we're using is multilingual:
     mq.create_index(index_name=INDEX_NAME, model='stsb-xlm-r-multilingual')
 
@@ -75,8 +80,6 @@ def build_index():
                 # Index the document. The device is set to 'cuda' to take
                 # advantage of the machine's GPU. If you don't have a GPU,
                 # change this argument to 'cpu'.
-                # We do not set auto_refresh, which will make it default to False. This is optimal for indexing
-                # a lot of documents.
                 mq.index(index_name=INDEX_NAME).add_documents(
                     documents=[to_post], device=DEVICE,
                     tensor_fields=["language", "text", "labels"]
@@ -86,9 +89,7 @@ def build_index():
 
 
 def search(q):
-    # Set searchable_attributes to 'text', which ensures that Marqo just
-    # searches the 'text' field
-    result = mq.index(INDEX_NAME).search(q=q, searchable_attributes=['text'])
+    result = mq.index(INDEX_NAME).search(q=q)
     # Just print out the highlights, which makes the output easier to read
     for res in result["hits"]:
         pprint.pprint(res["_highlights"])

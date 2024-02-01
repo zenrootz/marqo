@@ -54,7 +54,7 @@ To solve this, we need to start our Marqo docker container, which creates a Pyth
 ```
 docker pull marqoai/marqo:latest;
 docker rm -f marqo;
-docker run --name marqo -it --privileged -p 8882:8882 --add-host host.docker.internal:host-gateway marqoai/marqo:latest
+docker run --name marqo -it -p 8882:8882 --add-host host.docker.internal:host-gateway marqoai/marqo:latest
 ```
 
 Next, let's look at our example news documents corpus, which contains BBC and Reuters news content from 8th and 9th of November. We use "_id" as Marqo document identifier, the "date" the article was written, "website" indicating the web domain, "Title" for the headline, and "Description" for the article body:
@@ -83,7 +83,7 @@ print('creating a Marqo index')
 mq.create_index(DOC_INDEX_NAME)
 
 print('Indexing documents')
-mq.index(DOC_INDEX_NAME).add_documents(MARQO_DOCUMENTS, tensor_fields= ["Title", "Description"], auto_refresh=True)
+mq.index(DOC_INDEX_NAME).add_documents(MARQO_DOCUMENTS, tensor_fields= ["Title", "Description"])
 ```  
 
 Now we have indexed our news documents, we can simply use Marqo Python search API to return relevant context for our GPT3 generation.  For query "q", we use the question and want to match news context based on the "Title" and "Description" text. We also want to filter our documents for "today", which was '2022-11-09'.   
@@ -92,7 +92,6 @@ question = 'What is happening in business today?'
 date = '2022-11-09'
 results = mq.index(DOC_INDEX_NAME).search(
 					q=question,
-                    searchable_attributes=['Title', 'Description'],
 					filter_string=f"date:{date}"
                     limit=5)
 ```  

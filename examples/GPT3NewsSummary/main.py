@@ -38,7 +38,7 @@ if __name__ == '__main__':
         mq.create_index(DOC_INDEX_NAME)
 
         print('Indexing documents')
-        mq.index(DOC_INDEX_NAME).add_documents(MARQO_DOCUMENTS, tensor_fields= ["Title", "Description"], auto_refresh=True)
+        mq.index(DOC_INDEX_NAME).add_documents(MARQO_DOCUMENTS, tensor_fields= ["Title", "Description"])
         print('Done')
 
 
@@ -91,12 +91,10 @@ if __name__ == '__main__':
             # Query Marqo and set filters based on user query
             if isinstance(date, str):
                 results = mq.index(DOC_INDEX_NAME).search(q=question,
-                                                          searchable_attributes=['Title', 'Description'],
                                                           filter_string=f"date:{date}",
                                                           limit=5)
             else:
                 results = mq.index(DOC_INDEX_NAME).search(q=question,
-                                                          searchable_attributes=['Title', 'Description'],
                                                           limit=5)
 
             # Build context using Marqo's highlighting functionality.

@@ -1,3 +1,78 @@
+# Release 2.1.0
+
+## New features
+- Search result maximum limit and offset greatly increased. Maximum `limit` parameter increased from 400 to 1,000, `offset` increased from 1,000 to 10,000. Maximum value for `MARQO_MAX_RETRIEVABLE_DOCS` configuration is now 10,000 ([#735](https://github.com/marqo-ai/marqo/pull/735)​​, [#737](https://github.com/marqo-ai/marqo/pull/737)​​). See search `limit` and `offset` usage [here](https://docs.marqo.ai/2.1.0/API-Reference/Search/search/#limit)
+
+## Bug fixes and minor changes
+- Improved the Marqo bootstrapping process to address unexpected API behaviour when no index has been created yet (https://github.com/marqo-ai/marqo/pull/730).
+- Improved validation for `create_index` settings (https://github.com/marqo-ai/marqo/pull/717, https://github.com/marqo-ai/marqo/pull/734). Using `dependent_fields` as a request body parameter will now raise a 400 validation error.
+- Improved data parsing for documents in unstructured indexes (https://github.com/marqo-ai/marqo/pull/732). 
+- Made vector store layer config upgrades and rollbacks easier ([#735](https://github.com/marqo-ai/marqo/pull/735)​​, [#736](https://github.com/marqo-ai/marqo/pull/736)​​). 
+- Readme improvements (https://github.com/marqo-ai/marqo/pull/729). 
+
+
+# Release 2.0.1
+
+## Bug fixes and minor changes
+- Improved stability of `use_existing_tensors` feature in `add_documents` (https://github.com/marqo-ai/marqo/pull/725).
+- Improved readability of Marqo start-up logs (https://github.com/marqo-ai/marqo/pull/719).
+- Removed obsolete examples ([#721](https://github.com/marqo-ai/marqo/pull/721), [#723](https://github.com/marqo-ai/marqo/pull/723)).
+
+
+# Release 2.0.0
+## New features
+* Significant queries-per-second (QPS) and latency improvements in addition to reduced memory and storage requirements. 
+Get a higher QPS and a lower latency for the same infrastructure cost, or get the same performance for much cheaper! 
+In our large-scale experiments, we have achieved 2x QPS improvement, 2x speed-up in P50 search latency and 2.3x
+speed-up in P99 search latency, compared to previous Marqo versions.
+* Significantly improved recall. You can now get up to 99% recall (depending on your dataset and configuration) without 
+sacrificing performance.
+* Support for bfloat16 numeric type. Index 2x more vectors with the same amount of memory for a minimal reduction in
+recall and performance.
+* Structured index. You can now create structured indexes, which provide better data validation, higher performance, 
+better recall and better memory efficiency.
+* New API search parameter  `efSearch`. Search API now accepts an optional `efSearch` parameter which allows you to 
+fine-tune the underlying HNSW search. Increase efSearch to improve recall at a minor cost of QPS and latency. See 
+[here](https://docs.marqo.ai/2.0.0/API-Reference/Search/search/#body) for usage. 
+* Exact nearest neighbour search. Set `"approximate": false` in the Search API body to perform an exact nearest 
+neighbour search. This is useful for calculating recall and finding the best `efSearch` for your dataset. 
+See [here](https://docs.marqo.ai/2.0.0/API-Reference/Search/search/#body) for usage. 
+* New approximate nearest neighbour space types. Marqo now supports `euclidean`, `angular`, `dotproduct`,
+`prenormalized-angular`, and `hamming` distance metrics. L1, L2 and Linf distance metrics are no longer supported.
+The distance metric determines how Marqo calculates the closeness between indexed documents and search queries.
+* Easier local runs. Simply run `docker run -p 8882:8882 marqoai/marqo:2.0.0` to start Marqo locally on both 
+ARM64 (M-series Macs) and AMD64 machines.
+
+## Breaking changes
+* Create index API no longer accept the `index_defaults` parameter. Attributes previously defined in this object, 
+like `textPreprocessing`, are now moved out to the top level settings object. 
+See [here](https://docs.marqo.ai/2.0.0/API-Reference/Indexes/create_index/) for details.
+* Create index API's `filterStringMaxLength` parameter determines the maximum length of strings that are indexed for 
+filtering (default value 20 characters). This limitation does not apply to structured indexes. 
+See [here](https://docs.marqo.ai/2.0.0/API-Reference/Indexes/create_index/) for details.
+* Most APIs now require camel case request bodies and return camel case responses. See 
+[create index](https://docs.marqo.ai/2.0.0/API-Reference/Indexes/create_index/), 
+[search](https://docs.marqo.ai/2.0.0/API-Reference/Search/search/) and 
+[add documents](https://docs.marqo.ai/2.0.0/API-Reference/Documents/add_or_replace_documents/) for a few examples.
+* New Marqo configuration parameters See [here](https://docs.marqo.ai/2.0.0/Guides/Advanced-Usage/configuration/) for 
+usage.
+* Search response `_highlights` attribute is now a list of dictionaries. 
+See [here](https://docs.marqo.ai/2.0.0/API-Reference/Search/search/#response-200-ok) for new usage.
+* Add documents multimodal fields are defined as normal fields and not dictionaries. Furthermore, the mappings object 
+is optional for structured indexes. See [here](https://docs.marqo.ai/2.0.0/API-Reference/Documents/add_or_replace_documents/) for usage.
+* Add documents does not accept the `refresh` parameter anymore.
+* The following features are available in Marqo 1.5, but are not supported by Marqo 2.0 and will be added in future 
+releases:
+  * Separate models for search and add documents
+  * Prefixes for text chunks and queries
+  * Configurable document count limit for add documents. There is a non-configurable limit of 128 in Marqo 2.0.
+  * Custom (externally generated) vectors and `no_model` option for index creation.
+  * Optional Search API `q` parameter when searching with context vectors.
+
+## Contributor shout-outs
+* Thank you to the community for your invaluable feedback, which drove the prioritisation for this major release.
+* A warm thank you to all our 3.9k stargazers.
+
 # Release 1.5.1
 ## Bug fixes and minor changes
 - Adding `no_model` to `MARQO_MODELS_TO_PRELOAD` no longer causes an error on startup. Preloading process is simply skipped for this model [#657](https://github.com/marqo-ai/marqo/pull/657).
